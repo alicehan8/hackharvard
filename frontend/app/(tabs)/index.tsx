@@ -8,6 +8,7 @@ import {
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { uploadPhoto } from '../../api/uploadService';
 
 // Define types for file and error
 type FileURI = string | null;
@@ -37,6 +38,13 @@ export default function HomeScreen() {
       if (!result.canceled && result.assets?.[0].uri) {
         // If an image is selected (not canceled), update the file state variable
         setFile(result.assets[0].uri);
+
+        try {
+          const result = await uploadPhoto(String(file));
+          console.log('File uploaded successfully', result);
+        } catch (error) {
+          console.error('Error uploading file:', error);
+        }
 
         // Clear any previous errors
         setError(null);
