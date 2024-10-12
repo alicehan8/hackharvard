@@ -2,14 +2,14 @@
 // const express = require('express');
 // const multer = require('multer');
 // const axios = require('axios');
-const FormData = require('form-data');
+// const FormData = require('form-data');
 const fs = require('fs');
 // const router = express.Router();
 
 // const app = express();
 // // const port = 3000;
 
-// require('dotenv').config();
+require('dotenv').config();
 
 // Set up Multer for file uploads
 // const storage = multer.memoryStorage(); // Store files in memory
@@ -75,22 +75,26 @@ const fs = require('fs');
 
 
 
-function parseReceipt() {
+function parseReceipt(image) {
     const form = new FormData();
     form.append('extractTime', 'false');
+    // form.append('extractLineItems', 'true');
     form.append('refresh', 'false');
     form.append('incognito', 'false');
+    form.append('file', image);
     // form.append('file', fs.createReadStream('/Users/alicehan/Desktop/hackharvard/backend/receipt.png'));
-    form.append('file', "receipt.png");
+    // form.append('file', fs.createReadStream('receipt.png'));
+    // form.append('file', fileInput.files[0], "./receipt.png");
+    // form.append('file', "./receipt.png");
+
+    // console.log(form);
 
     const options = {
         method: 'POST',
-        headers: { accept: 'application/json', apikey: `c54f43a0884211efb0f8efd54ea213cb` }
+        headers: { accept: 'application/json', apikey: `${process.env.TAGGUN_API_KEY}` }
     };
 
     options.body = form;
-
-    console.log(options);
 
     fetch('https://api.taggun.io/api/receipt/v1/simple/file', options)
         .then(response => response.json())
