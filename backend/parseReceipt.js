@@ -2,7 +2,8 @@
 // const express = require('express');
 // const multer = require('multer');
 // const axios = require('axios');
-// const FormData = require('form-data');
+const FormData = require('form-data');
+const fs = require('fs');
 // const router = express.Router();
 
 // const app = express();
@@ -58,11 +59,43 @@
 
 
 // module.exports = router;
+// import taggun from '@api/taggun';
+
+// function parseReceipt() {
+//     // Your parsing logic here
+//     console.log("Parsing receipt...");
+
+//     const form = new FormData();
+//     form.append('file', fs.createReadStream('./receipt.png'));
+//     taggun.auth(`${process.env.TAGGUN_API_KEY}`);
+//     taggun.uploadFileSimple(form, { extractTime: 'false', refresh: 'false', incognito: 'false' })
+//         .then(({ data }) => console.log(data))
+//         .catch(err => console.error(err));
+// }
+
+
 
 function parseReceipt() {
-    // Your parsing logic here
-    console.log("Parsing receipt...");
-    
+    const form = new FormData();
+    form.append('extractTime', 'false');
+    form.append('refresh', 'false');
+    form.append('incognito', 'false');
+    // form.append('file', fs.createReadStream('/Users/alicehan/Desktop/hackharvard/backend/receipt.png'));
+    form.append('file', "receipt.png");
+
+    const options = {
+        method: 'POST',
+        headers: { accept: 'application/json', apikey: `c54f43a0884211efb0f8efd54ea213cb` }
+    };
+
+    options.body = form;
+
+    console.log(options);
+
+    fetch('https://api.taggun.io/api/receipt/v1/simple/file', options)
+        .then(response => response.json())
+        .then(response => console.log(response))
+        .catch(err => console.error(err));
 }
 
 module.exports = parseReceipt;
