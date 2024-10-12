@@ -3,14 +3,10 @@ import axios from 'axios';
 export const uploadPhoto = async (fileUri: string) => {
   const formData = new FormData();
 
-  formData.append('file', {
-    uri: fileUri,
-    type: 'image/png',
-    name: 'receipt.png',
-  });
+  formData.append('file', fileUri);
 
   try {
-    const response = await axios.post('https://your-backend-api/upload', formData, {
+    const response = await axios.post('http://localhost:3000/parse', fileUri, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

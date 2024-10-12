@@ -76,6 +76,19 @@ require('dotenv').config();
 
 
 function parseReceipt(image) {
+    console.log("calling parseReceipt");
+
+    // const imageUri = "";
+
+    // for (const [key, value] of image) {
+    //     if (key == 'file' && value.uri) {
+    //         imageUri = value.uri;
+    //         console.log("got image uri");
+    //     } else {
+    //         console.error("no image uri in backend");
+    //     }
+    // }
+
     const form = new FormData();
     form.append('extractTime', 'false');
     // form.append('extractLineItems', 'true');
@@ -95,6 +108,7 @@ function parseReceipt(image) {
     };
 
     options.body = form;
+    console.log(options);
 
     fetch('https://api.taggun.io/api/receipt/v1/simple/file', options)
         .then(response => response.json())
