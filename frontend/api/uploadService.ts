@@ -1,14 +1,12 @@
 import axios from 'axios';
 
-export const uploadPhoto = async (fileUri: string) => {
-  const formData = new FormData();
-
-  formData.append('file', fileUri);
-
+export const uploadPhoto = async (base64Image: string) => {
   try {
-    const response = await axios.post('http://localhost:3000/parse', fileUri, {
+    const response = await axios.post('http://localhost:3000/parse', {
+      base64: base64Image,
+    }, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'application/json', // Change to application/json since we're sending JSON
       },
     });
 
