@@ -13,8 +13,10 @@ const openai = new OpenAI({
 async function getAllIngredients() {
   try {
     const receipts = await Receipt.find({});
-    console.log(receipts);
-    return receipts;
+    const allItems = receipts.flatMap(receipt => receipt.items || []);
+    console.log("items? ");
+    console.log(allItems);
+    return allItems;
   } catch (error) {
     console.error('error fetching receipts:', error);
     throw error;
@@ -27,6 +29,7 @@ async function getRecipe() {
 
   const prompt = `You are a chef who is able to quickly and easily put together a recipe with random ingredients. Given the following ingredients and their expiration dates, put together a quick meal that a college student can make in their apartment that will use the ingredients that are going to expire soonest: 
   Here are the ingredients: ${items.map(item => item.name).join(', ')}`;
+  console.log(prompt);
 
   try {
     const response = await openai.chat.completions.create({
