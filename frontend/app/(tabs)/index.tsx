@@ -1,70 +1,146 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { uploadPhoto } from '../../api/uploadService';
+import * as FileSystem from 'expo-file-system';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+// Define types for file and error
+type FileURI = string | null;
+type ErrorMessage = string | null;
 
 export default function HomeScreen() {
+  // Stores the selected image URI
+  const [file, setFile] = useState<FileURI>(null);
+
+  // Stores any error message
+  const [error, setError] = useState<ErrorMessage>(null);
+
+  // Function to pick an image from the device's media library
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert("Permission Denied", "Sorry, we need camera roll permission to upload images.");
+    } else {
+      const result = await ImagePicker.launchImageLibraryAsync();
+
+      if (!result.canceled && result.assets?.[0].uri) {
+        const temp = result.assets[0].uri;
+
+        // Convert the image to base64
+        const base64Image = await fetch(temp)
+          .then(response => response.blob())
+          .then(blob => {
+            return new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result);
+              reader.readAsDataURL(blob);
+            });
+          });
+
+        setFile(temp);
+        // try {
+        //   const uploadResult = await uploadPhoto(base64Image);
+        //   console.log('File uploaded successfully', uploadResult);
+        // } catch (error) {
+        //   console.error('Error uploading file:', error);
+        // }
+
+        setError(null);
+      }
+    }
+  };
+
+  // Effect to upload the photo when the file state updates
+  useEffect(() => {
+    const uploadImage = async () => {
+      if (file) {
+        try {
+          const result = await uploadPhoto(file);
+        } catch (error) {
+          console.error('Error uploading file2:', error);
+          setError("Upload failed. Please try again."); // Set error message
+        }
+      }
+    };
+
+    uploadImage();
+  }, [file]); // Dependency array to trigger effect when file changes
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <Text style={styles.header}>Add Image:</Text>
+
+      {/* Button to choose an image */}
+      <TouchableOpacity style={styles.button} onPress={pickImage}>
+        <Text style={styles.buttonText}>Choose Image</Text>
+      </TouchableOpacity>
+
+      {/* Conditionally render the image or error message */}
+      {/* {console.log("Displaying image with URI:", file)} */}
+      {file ? (
+        // Display the selected image
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: file }} style={styles.image} />
+        </View>
+      ) : (
+        // Display an error message if there's an error or no image selected
+        <Text style={styles.errorText}>{error}</Text>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  header: {
+    fontSize: 20,
+    marginBottom: 16,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  button: {
+    backgroundColor: "#007AFF",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 16,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  imageContainer: {
+    borderRadius: 8,
+    marginBottom: 16,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 8,
+  },
+  errorText: {
+    color: "red",
+    marginTop: 16,
   },
 });
