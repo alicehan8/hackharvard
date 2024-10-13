@@ -12,7 +12,7 @@
   ```
 * front end
   ```
-  cd frontend
+  cd frontend:
   ```
   ```
   npx expo start
