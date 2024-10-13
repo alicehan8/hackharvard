@@ -23,7 +23,7 @@ async function getAllIngredients() {
 
 
 async function getRecipe() {
-  const items = getAllIngredients();
+  const items = await getAllIngredients();
 
   const prompt = `You are a chef who is able to quickly and easily put together a recipe with random ingredients. Given the following ingredients and their expiration dates, put together a quick meal that a college student can make in their apartment that will use the ingredients that are going to expire soonest: 
   Here are the ingredients: ${items.items}`;
