@@ -1,8 +1,8 @@
 // index.js
 // const express = require('express');
 // const multer = require('multer');
-// const axios = require('axios');
-// const FormData = require('form-data');
+const axios = require('axios');
+const FormData = require('form-data');
 const fs = require('fs');
 // const router = express.Router();
 
@@ -94,7 +94,20 @@ function parseReceipt(image) {
     // form.append('extractLineItems', 'true');
     form.append('refresh', 'false');
     form.append('incognito', 'false');
-    form.append('file', image);
+
+    // Use the Multer-generated filename, but append the correct extension
+    const fileExtension = image.mimetype.split('/')[1];
+    const fileName = `${image.filename}.${fileExtension}`;
+
+    form.append('file', fs.createReadStream(image.path), {
+        filename: fileName,
+        contentType: image.mimetype
+    });
+    // form.append('file', image.path, {
+    //     filename: '/Users/tiffliu/Desktop/pp/hackharvard/backend/uploads/receipt.png',
+    //     contentType: 'image/png'
+    // });
+    console.log("form", form);
     // form.append('file', fs.createReadStream('/Users/alicehan/Desktop/hackharvard/backend/receipt.png'));
     // form.append('file', fs.createReadStream('receipt.png'));
     // form.append('file', fileInput.files[0], "./receipt.png");
@@ -102,18 +115,35 @@ function parseReceipt(image) {
 
     // console.log(form);
 
+    // const options = {
+    //     method: 'POST',
+    //     headers: { accept: 'application/json', apikey: `${process.env.TAGGUN_API_KEY}` }
+    // };
+
+    // options.body = form;
+    // console.log(options);
     const options = {
         method: 'POST',
-        headers: { accept: 'application/json', apikey: `${process.env.TAGGUN_API_KEY}` }
+        url: 'https://api.taggun.io/api/receipt/v1/simple/file',
+        headers: {
+            ...form.getHeaders(), // Include form-data headers (important!)
+            accept: 'application/json',
+            apikey: process.env.TAGGUN_API_KEY // Your Taggun API key from .env file
+        },
+        data: form // Attach the form data
     };
 
-    options.body = form;
-    console.log(options);
-
-    fetch('https://api.taggun.io/api/receipt/v1/simple/file', options)
-        .then(response => response.json())
-        .then(response => console.log(response))
-        .catch(err => console.error(err));
+    // fetch('https://api.taggun.io/api/receipt/v1/simple/file', options)
+    //     .then(response => response.json())
+    //     .then(response => console.log(response))
+    //     .catch(err => console.error(err));
+    return axios(options)
+        .then(response => {
+            console.log('API Response:', response.data);
+        })
+        .catch(err => {
+            console.error('Error from API:', err.response ? err.response.data : err.message);
+        });
 }
 
 module.exports = parseReceipt;
