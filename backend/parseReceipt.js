@@ -76,22 +76,10 @@ require('dotenv').config();
 
 
 function parseReceipt(image) {
-    console.log("calling parseReceipt");
-
-    // const imageUri = "";
-
-    // for (const [key, value] of image) {
-    //     if (key == 'file' && value.uri) {
-    //         imageUri = value.uri;
-    //         console.log("got image uri");
-    //     } else {
-    //         console.error("no image uri in backend");
-    //     }
-    // }
 
     const form = new FormData();
     form.append('extractTime', 'false');
-    // form.append('extractLineItems', 'true');
+    form.append('extractLineItems', 'true');
     form.append('refresh', 'false');
     form.append('incognito', 'false');
 
@@ -103,28 +91,10 @@ function parseReceipt(image) {
         filename: fileName,
         contentType: image.mimetype
     });
-    // form.append('file', image.path, {
-    //     filename: '/Users/tiffliu/Desktop/pp/hackharvard/backend/uploads/receipt.png',
-    //     contentType: 'image/png'
-    // });
-    console.log("form", form);
-    // form.append('file', fs.createReadStream('/Users/alicehan/Desktop/hackharvard/backend/receipt.png'));
-    // form.append('file', fs.createReadStream('receipt.png'));
-    // form.append('file', fileInput.files[0], "./receipt.png");
-    // form.append('file', "./receipt.png");
 
-    // console.log(form);
-
-    // const options = {
-    //     method: 'POST',
-    //     headers: { accept: 'application/json', apikey: `${process.env.TAGGUN_API_KEY}` }
-    // };
-
-    // options.body = form;
-    // console.log(options);
     const options = {
         method: 'POST',
-        url: 'https://api.taggun.io/api/receipt/v1/simple/file',
+        url: 'https://api.taggun.io/api/receipt/v1/verbose/file',
         headers: {
             ...form.getHeaders(), // Include form-data headers (important!)
             accept: 'application/json',
@@ -139,7 +109,11 @@ function parseReceipt(image) {
     //     .catch(err => console.error(err));
     return axios(options)
         .then(response => {
-            console.log('API Response:', response.data);
+
+            const receiptData = response.data.entities;
+            const productTexts = receiptData.productLineItems.map(item => item.text);
+            console.log("products", productTexts);
+            // now we need to parse this data, get the expiration dates, and send this info to the database 
         })
         .catch(err => {
             console.error('Error from API:', err.response ? err.response.data : err.message);

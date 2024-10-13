@@ -21,7 +21,7 @@ export const uploadPhoto = async (fileUri: string) => {
       },
     });
 
-    console.log('Upload successful:', response.data);
+    // console.log('Upload successful:', response.data);
     return response.data;
   } catch (error) {
     console.error('Upload failed:', error);

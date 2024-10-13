@@ -44,7 +44,6 @@ export default function HomeScreen() {
               reader.readAsDataURL(blob);
             });
           });
-        console.log("base64 image", base64Image)
 
         setFile(temp);
         // try {
@@ -65,7 +64,6 @@ export default function HomeScreen() {
       if (file) {
         try {
           const result = await uploadPhoto(file);
-          console.log('File uploaded successfully', result);
         } catch (error) {
           console.error('Error uploading file2:', error);
           setError("Upload failed. Please try again."); // Set error message
@@ -86,7 +84,7 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       {/* Conditionally render the image or error message */}
-      {console.log("Displaying image with URI:", file)}
+      {/* {console.log("Displaying image with URI:", file)} */}
       {file ? (
         // Display the selected image
         <View style={styles.imageContainer}>
