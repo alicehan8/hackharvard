@@ -26,7 +26,7 @@ async function getRecipe() {
   const items = await getAllIngredients();
 
   const prompt = `You are a chef who is able to quickly and easily put together a recipe with random ingredients. Given the following ingredients and their expiration dates, put together a quick meal that a college student can make in their apartment that will use the ingredients that are going to expire soonest: 
-  Here are the ingredients: ${items.items}`;
+  Here are the ingredients: ${items.map(item => item.name).join(', ')}`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -38,7 +38,8 @@ async function getRecipe() {
 
     console.log(response.choices[0].message.content);
 
-    return JSON.parse(response.choices[0].message.content);
+    //return JSON.parse(response.choices[0].message.content);
+    return response.choices[0].message.content;
   } catch (error) {
     console.error("Error with OpenAI API: ", error);
     throw error;
