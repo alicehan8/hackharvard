@@ -1,0 +1,58 @@
+{
+    "entities": {
+        "productLineItems": [
+        {
+            "name": "Mini Milk Choc Pretzels",
+            "expiration_date": "2025-04-12"
+        },
+        {
+            "name": "Apple Cider Donuts",
+            "expiration_date": "2024-10-15"
+        },
+        {
+            "name": "Roasted Garlic Marinara",
+            "expiration_date": "2025-10-12"
+        },
+        {
+            "name": "Soyaki",
+            "expiration_date": "2025-10-12"
+        },
+        {
+            "name": "Vegetable Fried Rice",
+            "expiration_date": "2025-04-12"
+        },
+        {
+            "name": "2lb Mandarin Bag",
+            "expiration_date": "2024-10-24"
+        },
+        {
+            "name": "Butternut Mac & Cheese",
+            "expiration_date": "2024-10-19"
+        },
+        {
+            "name": "Italian Style Meatballs",
+            "expiration_date": "2025-04-12"
+        },
+        {
+            "name": "Ground Beef 80/20",
+            "expiration_date": "2024-10-16"
+        },
+        {
+            "name": "Baby Crispy Green Lettuce",
+            "expiration_date": "2024-10-18"
+        },
+        {
+            "name": "Chicken Breast Boneless",
+            "expiration_date": "2024-10-19"
+        },
+        {
+            "name": "Salmon Fillet Skin On",
+            "expiration_date": "2024-10-15"
+        },
+        {
+            "name": "Gnocchi Alla Sorrentina",
+            "expiration_date": "2025-04-12"
+        }
+        ]
+    }
+  }
