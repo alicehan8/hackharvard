@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,13 +6,22 @@ import {
   StyleSheet,
   FlatList,
 } from "react-native";
+import {getRecipe} from "../../api/getRecipe";
 
 export default function Fridge() {
   const [recipe, setRecipe] = useState("");
 
   const generateRecipe = async () => {
     // Call to backend to generate a recipe
-    setRecipe("Cut up some cheese and put it on a plate. Great work!");
+    try {
+      console.log("generating recipe...");
+      const result = await getRecipe();
+      setRecipe(result.recipe || "No recipe found.");
+    } catch (error) {
+      console.error('Error getting recipe:', error);
+      setRecipe("Failed to generate recipe.");
+    }
+    // setRecipe("Cut up some cheese and put it on a plate. Great work!");
   };
 
   return (
@@ -32,10 +41,10 @@ export default function Fridge() {
         <Text style={styles.buttonText}>Generate a Recipe</Text>
       </TouchableOpacity>
 
-      {/* {recipe && (
+      {recipe && (
         <>
           <Text style={styles.title}>Your New Recipe</Text>
-          <FlatList
+          {/* <FlatList
             data={data.items} // Make sure `data` is defined and accessible
             keyExtractor={(item) => item.name}
             renderItem={({ item }) => (
@@ -44,9 +53,10 @@ export default function Fridge() {
                 <Text style={styles.cell}>{item.expiration_date}</Text>
               </View>
             )}
-          />
+          /> */}
+          <Text>{recipe}</Text>
         </>
-      )} */}
+      )}
     </View>
   );
 }

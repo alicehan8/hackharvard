@@ -36,8 +36,6 @@ async function getRecipe() {
       temperature: 0.2,
     });
 
-    console.log(response.choices[0].message.content);
-
     //return JSON.parse(response.choices[0].message.content);
     return response.choices[0].message.content;
   } catch (error) {

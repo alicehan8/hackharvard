@@ -115,7 +115,7 @@ app.post('/parse', upload.single('file'), async (req, res) => {
 app.post('/recipe', async (req, res) => {
   try {
     const recipe = await getRecipe();  // Assuming getRecipe is defined correctly
-    res.status(200).send({ recipe });
+    res.send({ recipe });
   } catch (error) {
     res.status(500).send({ error: 'An error occurred while generating the recipe.' });
   }
