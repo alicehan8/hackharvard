@@ -76,10 +76,23 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Add Image:</Text>
+      <Text style={[styles.header1, { transform: [{ translateX: 0 }, { translateY: 18}], color: "#E07BE0", fontSize: 26}]}>
+        {/* WELCOME TO */}
+        BEAT THE RECEIPT
+      </Text>
+      <Text style={[styles.header1, { transform: [{ translateY: -30}]}]}>
+        WELCOME TO:
+      </Text>
+      <Text style={styles.header1}>
+        BEAT THE RECEIPT
+      </Text>
+
+      <Text style={[styles.header, { height: file ? 400 : 200, marginBottom: file ? -340 : -120 }]}>
+        Add Image:
+      </Text>
 
       {/* Button to choose an image */}
-      <TouchableOpacity style={styles.button} onPress={pickImage}>
+      <TouchableOpacity style={[styles.button, { display: file ? "none" : "flex" }]} onPress={pickImage}>
         <Text style={styles.buttonText}>Choose Image</Text>
       </TouchableOpacity>
 
@@ -104,10 +117,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
+    backgroundColor: "#CEFFCD",
+    borderRadius: 8,
   },
   header: {
     fontSize: 20,
-    marginBottom: 16,
+    textAlign: "center",
+    paddingTop: 16,
+    marginBottom: -130,
+    width: 300,
+    height: 400,
+    backgroundColor: "#E07BE0",
+    fontWeight: "500",
+    borderRadius: 8,
+  },
+  header1: {
+    fontSize: 25,
+    marginTop: -60,
+    marginBottom: 40,
+    fontWeight: "1000",
+    color: "#0A1045",
   },
   button: {
     backgroundColor: "#007AFF",
@@ -136,7 +165,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: 200,
-    height: 200,
+    height: 300,
     borderRadius: 8,
   },
   errorText: {
