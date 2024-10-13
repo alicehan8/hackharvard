@@ -64,7 +64,7 @@ const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); 
+const upload = multer({ dest: 'uploads/' });
 const axios = require('axios');
 const FormData = require('form-data');
 
@@ -72,6 +72,7 @@ const { mongoURI } = require('./config');
 const mongoose = require('mongoose');
 
 const parseReceipt = require("./parseReceipt");
+const getRecipe = require("./getRecipe.js");
 
 app.use(cors());
 app.use(express.json()); // Middleware to parse JSON body
@@ -87,29 +88,38 @@ app.use(express.json()); // Middleware to parse JSON body
 // app.use(bodyParser.text({ limit: "200mb" }));
 
 // connecting to mongo
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true})
-    .then(()=>console.log('mongodb connected'))
-    .catch(err => console.error("mongodb connection error: ", err))
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('mongodb connected'))
+  .catch(err => console.error("mongodb connection error: ", err))
 
 app.get("/", (req, res) => {
   res.send("Hello from Express!");
 });
 
 app.post('/parse', upload.single('file'), async (req, res) => {
-    const image = req.file;
-    if (!image) {
-        return res.status(400).send('No file uploaded.');
-    }
-    try {
-        console.log(req.file);
-        await parseReceipt(image);
-        res.send('Receipt is being processssssed')
-    } catch (error) {
-        console.error('Error processing receipt:', error);
-        res.status(500).send('Error processing receipt.');
-    }
-    
-})
+  const image = req.file;
+  if (!image) {
+    return res.status(400).send('No file uploaded.');
+  }
+  try {
+    console.log(req.file);
+    await parseReceipt(image);
+    res.send('Receipt is being processssssed')
+  } catch (error) {
+    console.error('Error processing receipt:', error);
+    res.status(500).send('Error processing receipt.');
+  }
+
+});
+
+app.post('/recipe', async (req, res) => {
+  try {
+    const recipe = await getRecipe();  // Assuming getRecipe is defined correctly
+    res.send({ recipe });
+  } catch (error) {
+    res.status(500).send({ error: 'An error occurred while generating the recipe.' });
+  }
+});
 
 // app.use('/parse', (req, res) => {
 //   console.log("parse in backend");
