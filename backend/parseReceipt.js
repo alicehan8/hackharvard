@@ -22,7 +22,7 @@ const openai = new OpenAI({
 
 async function getData(items, purchaseDate) {
     const prompt = `Provide expiration dates for the following items purchased on ${purchaseDate}. 
-Format the output as a JSON array of objects, where each object contains the shortened item name as "name" and its expiration date as "expiration date".
+Format the output as a JSON array of objects called "items", where each object contains the shortened item name as "name" and its expiration date as "expiration date". Do not use the json header, just the information.
 Items:
 ${items.join(", ")}`;
 
@@ -30,7 +30,7 @@ ${items.join(", ")}`;
         const response = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
             messages: [{ role: 'user', content: prompt }],
-            max_tokens: 300,
+            max_tokens: 1000,
             temperature: 0.2,
         });
 
@@ -43,7 +43,28 @@ ${items.join(", ")}`;
     }
 }
 
-function parseReceipt(image) {
+const Receipt = require('./models/Receipt');
+
+async function insertIntoDatabase(items) {
+    try {
+        let temp = await Receipt.findOne();
+        if (!temp) {
+            temp = new Receipt({
+            items: items,
+            });
+        } else {
+            temp.items.push(...items);
+        }
+
+        await temp.save();
+        console.log('Data successfully inserted into MongoDB');
+    } catch (error) {
+        console.error('Error inserting data into MongoDB:', error);
+    }
+}
+
+
+async function parseReceipt(image) {
 
     const form = new FormData();
     form.append('extractTime', 'false');
@@ -75,19 +96,40 @@ function parseReceipt(image) {
     //     .then(response => response.json())
     //     .then(response => console.log(response))
     //     .catch(err => console.error(err));
-    return axios(options)
-        .then(response => {
 
-            const receiptData = response.data.entities;
-            const productTexts = receiptData.productLineItems.map(item => item.text);
-            const today = new Date();
-            const productInfo = getData(productTexts, today);
-            console.log("products", productInfo);
-            // now we need to parse this data, get the expiration dates, and send this info to the database 
-        })
-        .catch(err => {
-            console.error('Error from API:', err.response ? err.response.data : err.message);
-        });
+    // return axios(options)
+    //     .then(response => {
+
+    //         const receiptData = response.data.entities;
+    //         const productTexts = receiptData.productLineItems.map(item => item.text);
+    //         const today = new Date();
+    //         const productInfo = getData(productTexts, today);
+    //         console.log("products", productInfo);
+    //         // now we need to parse this data, get the expiration dates, and send this info to the database 
+    //         insertIntoDatabase(productInfo);
+    //     })
+    //     .catch(err => {
+    //         console.error('Error from API:', err.response ? err.response.data : err.message);
+    //     });
+    try {
+        const response = await axios(options); // Wait for the axios response
+        const receiptData = response.data.entities;
+        const productTexts = receiptData.productLineItems.map(item => item.text);
+        const today = new Date();
+
+        // Assuming getData returns a promise
+        const productInfo = await getData(productTexts, today); // Wait for getData to resolve
+        console.log("products", productInfo);
+
+        // Now we need to parse this data and send this info to the database 
+        const formattedItems = productInfo.map(item => ({
+            name: item.name,
+            expiration_date: item.expiration_date
+          }));
+        await insertIntoDatabase(formattedItems); // Wait for insertIntoDatabase to complete
+    } catch (err) {
+        console.error('Error from API:', err.response ? err.response.data : err.message);
+    }
 }
 
 module.exports = parseReceipt;
