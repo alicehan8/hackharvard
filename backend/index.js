@@ -68,6 +68,9 @@ const upload = multer({ dest: 'uploads/' });
 const axios = require('axios');
 const FormData = require('form-data');
 
+const { mongoURI } = require('./config');
+const mongoose = require('mongoose');
+
 const parseReceipt = require("./parseReceipt");
 
 app.use(cors());
@@ -82,6 +85,11 @@ app.use(express.json()); // Middleware to parse JSON body
 //   })
 // );
 // app.use(bodyParser.text({ limit: "200mb" }));
+
+// connecting to mongo
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true})
+    .then(()=>console.log('mongodb connected'))
+    .catch(err => console.error("mongodb connection error: ", err))
 
 app.get("/", (req, res) => {
   res.send("Hello from Express!");
